@@ -4,7 +4,9 @@ import {
   ArrowRight,
   BadgeCheck,
   Check,
+  Clock3,
   HeartPulse,
+  MapPin,
   Menu,
   Search,
   Send,
@@ -13,6 +15,9 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroNurse from "@/assets/hero-nurse.jpg";
+import nurseGrace from "@/assets/nurse-grace.jpg";
+import nurseDaniel from "@/assets/nurse-daniel.jpg";
+import nursePriya from "@/assets/nurse-priya.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -61,6 +66,42 @@ const STEPS = [
     description:
       "Users can send a care request and connect with a qualified nurse.",
     icon: Send,
+  },
+];
+
+const NURSES = [
+  {
+    id: "grace-adeyemi",
+    name: "Grace Adeyemi",
+    image: nurseGrace,
+    title: "RN, BSc (Hons) Adult Nursing",
+    experience: "9 years experience",
+    location: "Didsbury, Manchester",
+    availability: "Available this week",
+    services:
+      "Specialises in post-operative recovery, wound care and medication management for adults healing at home.",
+  },
+  {
+    id: "daniel-osei",
+    name: "Daniel Osei",
+    image: nurseDaniel,
+    title: "RN, MSc Critical Care",
+    experience: "12 years experience",
+    location: "Edgbaston, Birmingham",
+    availability: "Available in 3 days",
+    services:
+      "Supports clients living with chronic conditions, complex mobility needs and respiratory care at home.",
+  },
+  {
+    id: "priya-sharma",
+    name: "Priya Sharma",
+    image: nursePriya,
+    title: "RGN, RM — Registered Midwife",
+    experience: "7 years experience",
+    location: "Kensington, London",
+    availability: "Available this week",
+    services:
+      "Focused on maternal and newborn support, postnatal recovery and feeding guidance for new families.",
   },
 ];
 
@@ -279,6 +320,91 @@ function Home() {
                 </li>
               ))}
             </ol>
+          </div>
+        </section>
+
+        <section
+          id="featured-nurses"
+          aria-labelledby="featured-nurses-heading"
+          className="scroll-mt-20 border-t border-line bg-secondary/45 py-20 sm:py-24 lg:py-28"
+        >
+          <div className="mx-auto max-w-7xl px-5 sm:px-8">
+            <div className="mx-auto max-w-2xl text-center">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
+                Featured Nurses
+              </p>
+              <h2
+                id="featured-nurses-heading"
+                className="mt-4 font-display text-3xl font-semibold leading-[1.15] text-balance text-ink sm:text-4xl lg:text-[2.75rem]"
+              >
+                Meet Our Featured Nurses
+              </h2>
+              <p className="mt-5 text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
+                Browse qualified, background-checked nurses near you and find the right match for the
+                care your family needs.
+              </p>
+            </div>
+
+            <ul className="mt-14 grid gap-6 sm:grid-cols-2 sm:mt-16 lg:grid-cols-3 lg:gap-8">
+              {NURSES.map((nurse) => (
+                <li key={nurse.id} className="flex">
+                  <article className="group flex h-full w-full flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-sm transition duration-300 hover:-translate-y-1 hover:border-primary/25 hover:shadow-xl hover:shadow-primary/5">
+                    <div className="relative overflow-hidden">
+                      <div className="aspect-[4/5] w-full overflow-hidden bg-secondary">
+                        <img
+                          src={nurse.image}
+                          alt={`Portrait of ${nurse.name}, ${nurse.title}`}
+                          width={768}
+                          height={960}
+                          loading="lazy"
+                          className="h-full w-full object-cover object-top transition duration-500 group-hover:scale-[1.03]"
+                        />
+                      </div>
+                      <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-surface/95 px-3 py-1.5 text-xs font-semibold text-success shadow-sm ring-1 ring-black/5 backdrop-blur">
+                        <BadgeCheck className="size-3.5" strokeWidth={2.2} aria-hidden="true" />
+                        Verified nurse
+                      </span>
+                    </div>
+
+                    <div className="flex flex-1 flex-col p-6 sm:p-7">
+                      <h3 className="font-display text-xl font-semibold leading-snug text-ink">
+                        {nurse.name}
+                      </h3>
+                      <p className="mt-1.5 text-sm font-medium text-primary">{nurse.title}</p>
+
+                      <div className="mt-5 flex flex-col gap-2.5 text-sm text-muted-foreground">
+                        <span className="flex items-center gap-2">
+                          <Clock3 className="size-4 shrink-0 text-primary" strokeWidth={1.9} aria-hidden="true" />
+                          {nurse.experience}
+                        </span>
+                        <span className="flex min-w-0 items-center gap-2">
+                          <MapPin className="size-4 shrink-0 text-primary" strokeWidth={1.9} aria-hidden="true" />
+                          <span className="truncate">{nurse.location}</span>
+                        </span>
+                      </div>
+
+                      <p className="mt-5 text-sm leading-6 text-muted-foreground">{nurse.services}</p>
+
+                      <span className="mt-6 block h-px w-full bg-line" aria-hidden="true" />
+
+                      <div className="mt-5 flex flex-1 flex-col gap-4">
+                        <span className="text-xs font-semibold text-success">{nurse.availability}</span>
+                        <Button
+                          asChild
+                          variant="outline"
+                          className="mt-auto h-11 w-full rounded-lg border-primary/25 bg-surface text-sm font-semibold text-primary shadow-none transition-colors hover:bg-primary hover:text-primary-foreground"
+                        >
+                          <a href={`#profile-${nurse.id}`} aria-label={`View profile of ${nurse.name}`}>
+                            View Profile
+                            <ArrowRight className="size-4" aria-hidden="true" />
+                          </a>
+                        </Button>
+                      </div>
+                    </div>
+                  </article>
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
       </main>
