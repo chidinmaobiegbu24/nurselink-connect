@@ -1,16 +1,22 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
+  Activity,
   ArrowRight,
   BadgeCheck,
   Check,
   Clock3,
+  HandHelping,
+  HeartHandshake,
   HeartPulse,
+  HousePlus,
   MapPin,
   Menu,
+  Pill,
   Search,
   Send,
   ShieldCheck,
+  Stethoscope,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -102,6 +108,47 @@ const NURSES = [
     availability: "Available this week",
     services:
       "Focused on maternal and newborn support, postnatal recovery and feeding guidance for new families.",
+  },
+];
+
+const SERVICES = [
+  {
+    id: "home-nursing-care",
+    title: "Home Nursing Care",
+    description:
+      "Professional nursing care provided in the comfort of your home.",
+    icon: HousePlus,
+  },
+  {
+    id: "elderly-care",
+    title: "Elderly Care",
+    description: "Compassionate support and care for elderly people.",
+    icon: HeartHandshake,
+  },
+  {
+    id: "post-surgery-care",
+    title: "Post-Surgery Care",
+    description: "Professional support for patients recovering after surgery.",
+    icon: Stethoscope,
+  },
+  {
+    id: "medication-assistance",
+    title: "Medication Assistance",
+    description:
+      "Help with medication reminders and basic medication support.",
+    icon: Pill,
+  },
+  {
+    id: "chronic-care-support",
+    title: "Chronic Care Support",
+    description: "Support for people living with long-term health conditions.",
+    icon: Activity,
+  },
+  {
+    id: "general-caregiving",
+    title: "General Caregiving",
+    description: "Daily caregiving and personal support based on individual needs.",
+    icon: HandHelping,
   },
 ];
 
