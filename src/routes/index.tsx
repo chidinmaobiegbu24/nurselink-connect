@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import heroNurse from "@/assets/hero-nurse.jpg";
 
@@ -286,7 +286,7 @@ function TrustPoint({
   children,
 }: {
   label: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <div className="flex items-center gap-3 px-1 py-6 sm:justify-center">
