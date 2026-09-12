@@ -454,6 +454,67 @@ function Home() {
             </ul>
           </div>
         </section>
+
+        <section
+          id="our-services"
+          aria-labelledby="our-services-heading"
+          className="scroll-mt-20 border-t border-line bg-paper py-20 sm:py-24 lg:py-28"
+        >
+          <div className="mx-auto max-w-7xl px-5 sm:px-8">
+            <div className="mx-auto max-w-2xl text-center">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
+                Our Services
+              </p>
+              <h2
+                id="our-services-heading"
+                className="mt-4 font-display text-3xl font-semibold leading-[1.15] text-balance text-ink sm:text-4xl lg:text-[2.75rem]"
+              >
+                Our Care Services
+              </h2>
+              <p className="mt-5 text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
+                Nurses Connect helps you find qualified nurses for a wide range of home-care needs —
+                from everyday support to specialist recovery care.
+              </p>
+            </div>
+
+            <ul className="mt-14 grid gap-6 sm:grid-cols-2 sm:mt-16 lg:grid-cols-3 lg:gap-8">
+              {SERVICES.map((service, index) => (
+                <li key={service.id} className="flex">
+                  <article className="group relative flex h-full w-full flex-col overflow-hidden rounded-2xl border border-line bg-surface p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-primary/25 hover:shadow-xl hover:shadow-primary/5 sm:p-8">
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-x-0 top-0 h-1 origin-left scale-x-0 bg-primary transition-transform duration-300 group-hover:scale-x-100"
+                    />
+                    <span
+                      className={`grid size-12 shrink-0 place-items-center rounded-xl transition-colors duration-300 sm:size-14 ${
+                        index % 2 === 0
+                          ? "bg-secondary text-primary group-hover:bg-primary group-hover:text-primary-foreground"
+                          : "bg-success-soft text-success group-hover:bg-success group-hover:text-primary-foreground"
+                      }`}
+                    >
+                      <service.icon className="size-6 sm:size-7" strokeWidth={1.9} aria-hidden="true" />
+                    </span>
+
+                    <h3 className="mt-6 font-display text-lg font-semibold leading-snug text-ink sm:text-xl">
+                      {service.title}
+                    </h3>
+                    <p className="mt-3 text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">
+                      {service.description}
+                    </p>
+
+                    <span
+                      aria-hidden="true"
+                      className="mt-6 block h-px w-full bg-line transition-colors duration-300 group-hover:bg-primary/20"
+                    />
+                    <span className="mt-3 font-mono text-xs text-muted-foreground/80">
+                      {`0${index + 1} / 0${SERVICES.length}`}
+                    </span>
+                  </article>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
       </main>
     </div>
   );
