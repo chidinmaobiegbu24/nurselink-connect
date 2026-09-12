@@ -56,7 +56,7 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Brand palette */
+  /* Nurses Connect healthcare palette */
   --color-ink: var(--ink);
   --color-paper: var(--paper);
   --color-surface: var(--surface);
@@ -66,6 +66,9 @@
   --color-clay: var(--clay);
   --color-clay-soft: var(--clay-soft);
   --color-line: var(--line);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-hero: var(--hero);
 }
 
 @theme {
@@ -78,15 +81,18 @@
   --radius: 0.625rem;
 
   /* Brand */
-  --ink: oklch(0.3 0.03 211.8);
-  --paper: oklch(0.968 0.009 91.5);
-  --surface: oklch(0.994 0.002 91.4);
-  --teal: oklch(0.505 0.065 207);
-  --teal-ink: oklch(0.368 0.05 207.2);
-  --teal-soft: oklch(0.93 0.013 206.4);
-  --clay: oklch(0.687 0.146 54.3);
-  --clay-soft: oklch(0.94 0.03 60);
-  --line: oklch(0.3 0.03 211.8 / 0.1);
+  --ink: oklch(0.25 0.04 247);
+  --paper: oklch(0.995 0.003 240);
+  --surface: oklch(1 0 0);
+  --teal: oklch(0.49 0.16 252);
+  --teal-ink: oklch(0.4 0.15 252);
+  --teal-soft: oklch(0.96 0.025 240);
+  --clay: oklch(0.62 0.12 164);
+  --clay-soft: oklch(0.96 0.035 158);
+  --success: oklch(0.48 0.12 164);
+  --success-soft: oklch(0.95 0.04 158);
+  --hero: oklch(0.975 0.012 238);
+  --line: oklch(0.4 0.04 247 / 0.13);
 
   /* shadcn surfaces, themed to the brand */
   --background: var(--paper);
@@ -100,7 +106,7 @@
   --secondary: var(--teal-soft);
   --secondary-foreground: var(--teal-ink);
   --muted: var(--teal-soft);
-  --muted-foreground: oklch(0.505 0.024 211.1);
+  --muted-foreground: oklch(0.48 0.035 247);
   --accent: var(--clay);
   --accent-foreground: var(--paper);
   --destructive: oklch(0.577 0.245 27.325);
@@ -108,9 +114,9 @@
   --border: var(--line);
   --input: var(--line);
   --ring: var(--teal);
-  --chart-1: oklch(0.505 0.065 207);
-  --chart-2: oklch(0.687 0.146 54.3);
-  --chart-3: oklch(0.368 0.05 207.2);
+  --chart-1: oklch(0.49 0.16 252);
+  --chart-2: oklch(0.48 0.12 164);
+  --chart-3: oklch(0.4 0.15 252);
   --chart-4: oklch(0.6 0.118 184.704);
   --chart-5: oklch(0.769 0.188 70.08);
   --sidebar: var(--surface);
@@ -186,6 +192,11 @@
 
 @utility rise {
   animation: nc-rise 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@utility bg-hero {
+  background:
+    linear-gradient(120deg, var(--hero) 0%, var(--paper) 56%, var(--success-soft) 145%);
 }
 
 @utility drift {
