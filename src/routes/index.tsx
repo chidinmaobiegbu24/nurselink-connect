@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, Check, HeartPulse, Menu, ShieldCheck, X } from "lucide-react";
+import {
+  ArrowRight,
+  BadgeCheck,
+  Check,
+  HeartPulse,
+  Menu,
+  Search,
+  Send,
+  ShieldCheck,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroNurse from "@/assets/hero-nurse.jpg";
 
@@ -26,6 +36,33 @@ export const Route = createFileRoute("/")({
 });
 
 const NAV_LINKS = ["Home", "Find a Nurse", "How It Works", "About"];
+
+const STEPS = [
+  {
+    id: "find",
+    label: "Step 1",
+    title: "Find a Nurse",
+    description:
+      "Users can search and browse qualified nurses based on their caregiving needs.",
+    icon: Search,
+  },
+  {
+    id: "profiles",
+    label: "Step 2",
+    title: "View Nurse Profiles",
+    description:
+      "Users can view nurse qualifications, experience, services, and other important information.",
+    icon: BadgeCheck,
+  },
+  {
+    id: "request",
+    label: "Step 3",
+    title: "Request Care",
+    description:
+      "Users can send a care request and connect with a qualified nurse.",
+    icon: Send,
+  },
+];
 
 function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
