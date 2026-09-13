@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Activity,
   ArrowRight,
@@ -152,6 +152,33 @@ const SERVICES = [
   },
 ];
 
+const BENEFITS = [
+  {
+    id: "qualified-nurses",
+    title: "Qualified Nurses",
+    description: "Connect with qualified and professional nurses for your caregiving needs.",
+    icon: BadgeCheck,
+  },
+  {
+    id: "easy-to-use",
+    title: "Easy to Use",
+    description: "Easily search, view, and connect with nurses through one simple platform.",
+    icon: Search,
+  },
+  {
+    id: "reliable-home-care",
+    title: "Reliable Home Care",
+    description: "Find professional caregivers who can provide support in the comfort of your home.",
+    icon: HousePlus,
+  },
+  {
+    id: "convenient-connection",
+    title: "Convenient Connection",
+    description: "Send care requests and connect with available nurses easily.",
+    icon: Send,
+  },
+];
+
 function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -162,34 +189,52 @@ function Home() {
           className="mx-auto grid h-18 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 sm:px-8 lg:flex lg:h-20 lg:justify-between"
           aria-label="Main navigation"
         >
-          <a href="#home" className="flex min-w-0 items-center gap-3" aria-label="Nurses Connect home">
+          <Link to="/" className="flex min-w-0 items-center gap-3" aria-label="Nurses Connect home">
             <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground shadow-sm">
               <HeartPulse className="size-5" strokeWidth={2.2} aria-hidden="true" />
             </span>
             <span className="truncate font-display text-xl font-semibold text-primary sm:text-2xl">
               Nurses Connect
             </span>
-          </a>
+          </Link>
 
           <div className="hidden items-center gap-8 lg:flex">
-            {NAV_LINKS.map((label, index) => (
-              <a
-                key={label}
-                href={index === 0 ? "#home" : `#${label.toLowerCase().replaceAll(" ", "-")}`}
-                aria-current={index === 0 ? "page" : undefined}
-                className="navlink text-sm font-medium text-muted-foreground transition-colors hover:text-primary aria-[current=page]:text-primary"
-              >
-                {label}
-              </a>
-            ))}
+            {NAV_LINKS.map((label, index) =>
+              index === 0 ? (
+                <Link
+                  key={label}
+                  to="/"
+                  aria-current="page"
+                  className="navlink text-sm font-medium text-muted-foreground transition-colors hover:text-primary aria-[current=page]:text-primary"
+                >
+                  {label}
+                </Link>
+              ) : index === 1 ? (
+                <Link
+                  key={label}
+                  to="/find-nurse"
+                  className="navlink text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+                >
+                  {label}
+                </Link>
+              ) : (
+                <a
+                  key={label}
+                  href={index === 2 ? "#how-it-works" : "#why-choose-nurses-connect"}
+                  className="navlink text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+                >
+                  {label}
+                </a>
+              )
+            )}
           </div>
 
           <div className="hidden items-center gap-2 lg:flex">
             <Button variant="ghost" asChild className="text-ink hover:bg-secondary hover:text-primary">
-              <a href="#login">Login</a>
+              <Link to="/">Login</Link>
             </Button>
             <Button asChild className="h-10 rounded-lg px-5 shadow-none">
-              <a href="#register">Register</a>
+              <Link to="/join-as-nurse">Register</Link>
             </Button>
           </div>
 
@@ -210,22 +255,42 @@ function Home() {
         {menuOpen && (
           <div id="mobile-nav" className="border-t border-line bg-paper px-5 py-4 lg:hidden">
             <div className="mx-auto flex max-w-7xl flex-col">
-              {NAV_LINKS.map((label, index) => (
-                <a
-                  key={label}
-                  href={index === 0 ? "#home" : `#${label.toLowerCase().replaceAll(" ", "-")}`}
-                  onClick={() => setMenuOpen(false)}
-                  className="rounded-lg px-3 py-3 text-sm font-medium text-ink transition-colors hover:bg-secondary hover:text-primary"
-                >
-                  {label}
-                </a>
-              ))}
+              {NAV_LINKS.map((label, index) =>
+                index === 0 ? (
+                  <Link
+                    key={label}
+                    to="/"
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-lg px-3 py-3 text-sm font-medium text-ink transition-colors hover:bg-secondary hover:text-primary"
+                  >
+                    {label}
+                  </Link>
+                ) : index === 1 ? (
+                  <Link
+                    key={label}
+                    to="/find-nurse"
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-lg px-3 py-3 text-sm font-medium text-ink transition-colors hover:bg-secondary hover:text-primary"
+                  >
+                    {label}
+                  </Link>
+                ) : (
+                  <a
+                    key={label}
+                    href={index === 2 ? "#how-it-works" : "#why-choose-nurses-connect"}
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-lg px-3 py-3 text-sm font-medium text-ink transition-colors hover:bg-secondary hover:text-primary"
+                  >
+                    {label}
+                  </a>
+                )
+              )}
               <div className="mt-3 grid grid-cols-2 gap-3 border-t border-line pt-4">
                 <Button variant="outline" asChild className="h-11 shadow-none">
-                  <a href="#login">Login</a>
+                  <Link to="/">Login</Link>
                 </Button>
                 <Button asChild className="h-11 shadow-none">
-                  <a href="#register">Register</a>
+                  <Link to="/join-as-nurse">Register</Link>
                 </Button>
               </div>
             </div>
@@ -252,10 +317,10 @@ function Home() {
 
               <div className="rise mt-8 flex flex-col gap-3 sm:flex-row">
                 <Button asChild size="lg" className="h-12 rounded-lg px-6 text-base shadow-lg shadow-primary/15">
-                  <a href="#find-a-nurse">
+                  <Link to="/find-nurse">
                     Find a Nurse
                     <ArrowRight aria-hidden="true" />
-                  </a>
+                  </Link>
                 </Button>
                 <Button
                   asChild
@@ -263,7 +328,7 @@ function Home() {
                   size="lg"
                   className="h-12 rounded-lg border-primary/25 bg-surface px-6 text-base text-primary shadow-none hover:bg-secondary hover:text-primary"
                 >
-                  <a href="#join-as-a-nurse">Join as a Nurse</a>
+                  <Link to="/join-as-nurse">Join as a Nurse</Link>
                 </Button>
               </div>
 
@@ -441,10 +506,14 @@ function Home() {
                           variant="outline"
                           className="mt-auto h-11 w-full rounded-lg border-primary/25 bg-surface text-sm font-semibold text-primary shadow-none transition-colors hover:bg-primary hover:text-primary-foreground"
                         >
-                          <a href={`#profile-${nurse.id}`} aria-label={`View profile of ${nurse.name}`}>
+                          <Link
+                            to="/nurse-profile/$nurseId"
+                            params={{ nurseId: nurse.id }}
+                            aria-label={`View profile of ${nurse.name}`}
+                          >
                             View Profile
                             <ArrowRight className="size-4" aria-hidden="true" />
-                          </a>
+                          </Link>
                         </Button>
                       </div>
                     </div>
@@ -515,7 +584,137 @@ function Home() {
             </ul>
           </div>
         </section>
+
+        <section
+          id="why-choose-nurses-connect"
+          aria-labelledby="why-choose-nurses-connect-heading"
+          className="scroll-mt-20 border-t border-line bg-secondary/35 py-20 sm:py-24 lg:py-28"
+        >
+          <div className="mx-auto max-w-7xl px-5 sm:px-8">
+            <div className="mx-auto max-w-2xl text-center">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
+                Why Choose Us
+              </p>
+              <h2
+                id="why-choose-nurses-connect-heading"
+                className="mt-4 font-display text-3xl font-semibold leading-[1.15] text-balance text-ink sm:text-4xl lg:text-[2.75rem]"
+              >
+                Why Choose Nurses Connect?
+              </h2>
+              <p className="mt-5 text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
+                Find trusted care with a platform designed to make connecting with professional nurses
+                simple, reliable, and reassuring.
+              </p>
+            </div>
+
+            <ul className="mt-14 grid gap-5 sm:mt-16 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+              {BENEFITS.map((benefit) => (
+                <li key={benefit.id} className="flex">
+                  <article className="group relative flex h-full w-full flex-col rounded-2xl border border-line bg-surface p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-primary/25 hover:shadow-xl hover:shadow-primary/5 sm:p-7">
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-x-0 top-0 h-1 origin-left scale-x-0 rounded-t-2xl bg-primary transition-transform duration-300 group-hover:scale-x-100"
+                    />
+                    <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-success-soft text-success transition-colors duration-300 group-hover:bg-success group-hover:text-primary-foreground sm:size-14">
+                      <benefit.icon className="size-6 sm:size-7" strokeWidth={1.9} aria-hidden="true" />
+                    </span>
+                    <h3 className="mt-6 font-display text-lg font-semibold leading-snug text-ink sm:text-xl">
+                      {benefit.title}
+                    </h3>
+                    <p className="mt-3 text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">
+                      {benefit.description}
+                    </p>
+                  </article>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
       </main>
     </div>
   );
 }
+
+{/* Call to Action Section */}
+<section className="py-16 px-6 bg-blue-900 text-white">
+  <div className="max-w-4xl mx-auto text-center">
+
+    <h2 className="text-3xl font-bold mb-4">
+      Ready to Find the Right Care?
+    </h2>
+
+    <p className="text-lg mb-8 text-blue-100">
+      Connect with qualified nurses and find professional care for
+      yourself or your loved ones.
+    </p>
+
+    <div className="flex flex-col sm:flex-row justify-center gap-4">
+
+      <Link to="/find-nurse" className="bg-white text-blue-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+        Find a Nurse
+      </Link>
+
+      <Link to="/join-as-nurse" className="bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 transition">
+        Join as a Nurse
+      </Link>
+
+    </div>
+
+  </div>
+</section>
+
+{/* Footer */}
+<footer className="bg-gray-950 text-white py-10 px-6">
+  <div className="max-w-6xl mx-auto">
+
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+      {/* Brand */}
+      <div>
+        <h2 className="text-2xl font-bold mb-3">
+          Nurses Connect
+        </h2>
+
+        <p className="text-gray-400">
+          Connecting individuals and families with qualified nurses
+          for reliable and professional home-care services.
+        </p>
+      </div>
+
+      {/* Quick Links */}
+      <div>
+        <h3 className="text-lg font-semibold mb-3">
+          Quick Links
+        </h3>
+
+        <ul className="space-y-2 text-gray-400">
+          <li><Link to="/" className="hover:text-white">Home</Link></li>
+          <li><a href="#our-services" className="hover:text-white">Services</a></li>
+          <li><a href="#why-choose-nurses-connect" className="hover:text-white">About</a></li>
+          <li><a href="#contact" className="hover:text-white">Contact</a></li>
+        </ul>
+      </div>
+
+      {/* Contact */}
+      <div id="contact">
+        <h3 className="text-lg font-semibold mb-3">
+          Contact
+        </h3>
+
+        <p className="text-gray-400 mb-2">
+          Email: info@nursesconnect.com
+        </p>
+
+        <p className="text-gray-400">
+          Professional care when you need it.
+        </p>
+      </div>
+
+    </div>
+
+    <div className="border-t border-gray-700 mt-8 pt-6 text-center text-gray-500">
+      © 2026 Nurses Connect. All rights reserved.
+    </div>
+
+  </div>
+</footer>

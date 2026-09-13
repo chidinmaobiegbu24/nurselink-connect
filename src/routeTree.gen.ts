@@ -10,33 +10,89 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FindNurseRouteImport } from './routes/find-nurse'
+import { Route as JoinAsNurseRouteImport } from './routes/join-as-nurse'
+import { Route as NurseProfileNurseIdRouteImport } from './routes/nurse-profile.$nurseId'
+import { Route as RequestCareNurseIdRouteImport } from './routes/request-care.$nurseId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FindNurseRoute = FindNurseRouteImport.update({
+  id: '/find-nurse',
+  path: '/find-nurse',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinAsNurseRoute = JoinAsNurseRouteImport.update({
+  id: '/join-as-nurse',
+  path: '/join-as-nurse',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NurseProfileNurseIdRoute = NurseProfileNurseIdRouteImport.update({
+  id: '/nurse-profile/$nurseId',
+  path: '/nurse-profile/$nurseId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RequestCareNurseIdRoute = RequestCareNurseIdRouteImport.update({
+  id: '/request-care/$nurseId',
+  path: '/request-care/$nurseId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/find-nurse': typeof FindNurseRoute
+  '/join-as-nurse': typeof JoinAsNurseRoute
+  '/nurse-profile/$nurseId': typeof NurseProfileNurseIdRoute
+  '/request-care/$nurseId': typeof RequestCareNurseIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/find-nurse': typeof FindNurseRoute
+  '/join-as-nurse': typeof JoinAsNurseRoute
+  '/nurse-profile/$nurseId': typeof NurseProfileNurseIdRoute
+  '/request-care/$nurseId': typeof RequestCareNurseIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/find-nurse': typeof FindNurseRoute
+  '/join-as-nurse': typeof JoinAsNurseRoute
+  '/nurse-profile/$nurseId': typeof NurseProfileNurseIdRoute
+  '/request-care/$nurseId': typeof RequestCareNurseIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/find-nurse'
+    | '/join-as-nurse'
+    | '/nurse-profile/$nurseId'
+    | '/request-care/$nurseId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/find-nurse'
+    | '/join-as-nurse'
+    | '/nurse-profile/$nurseId'
+    | '/request-care/$nurseId'
+  id:
+    | '__root__'
+    | '/'
+    | '/find-nurse'
+    | '/join-as-nurse'
+    | '/nurse-profile/$nurseId'
+    | '/request-care/$nurseId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  FindNurseRoute: typeof FindNurseRoute
+  JoinAsNurseRoute: typeof JoinAsNurseRoute
+  NurseProfileNurseIdRoute: typeof NurseProfileNurseIdRoute
+  RequestCareNurseIdRoute: typeof RequestCareNurseIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +104,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/find-nurse': {
+      id: '/find-nurse'
+      path: '/find-nurse'
+      fullPath: '/find-nurse'
+      preLoaderRoute: typeof FindNurseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join-as-nurse': {
+      id: '/join-as-nurse'
+      path: '/join-as-nurse'
+      fullPath: '/join-as-nurse'
+      preLoaderRoute: typeof JoinAsNurseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nurse-profile/$nurseId': {
+      id: '/nurse-profile/$nurseId'
+      path: '/nurse-profile/$nurseId'
+      fullPath: '/nurse-profile/$nurseId'
+      preLoaderRoute: typeof NurseProfileNurseIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/request-care/$nurseId': {
+      id: '/request-care/$nurseId'
+      path: '/request-care/$nurseId'
+      fullPath: '/request-care/$nurseId'
+      preLoaderRoute: typeof RequestCareNurseIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  FindNurseRoute: FindNurseRoute,
+  JoinAsNurseRoute: JoinAsNurseRoute,
+  NurseProfileNurseIdRoute: NurseProfileNurseIdRoute,
+  RequestCareNurseIdRoute: RequestCareNurseIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
