@@ -15,7 +15,10 @@ export default defineConfig({
       },
     },
   vite: {
-    base: process.env.VITE_BASE_PATH ?? "/nurselink-connect/",
+    server: {
+  port: 8082,
+},
+    base: process.env["VITE_BASE_PATH"] ?? "/nurselink-connect/",
     build: {
       outDir: "dist",
     },
