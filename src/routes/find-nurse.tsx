@@ -1,143 +1,294 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState } from "react";
-export const Route = createFileRoute('/find-nurse')({
+import { createFileRoute, Link } from "@tanstack/react-router";
+import {
+  ArrowLeft,
+  BadgeCheck,
+  BriefcaseMedical,
+  LoaderCircle,
+  MapPin,
+  Search,
+  ShieldCheck,
+  X,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import { getNurses } from "@/lib/mock-data";
+
+export const Route = createFileRoute("/find-nurse")({
+  head: () => ({
+    meta: [
+      { title: "Find a Nurse | Nurses Connect" },
+      {
+        name: "description",
+        content:
+          "Search qualified Nurses Connect professionals by name, location, role, or home-care specialization.",
+      },
+    ],
+  }),
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
   return <FindNurse />;
 }
 export default function FindNurse() {
-  const [location, setLocation] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedService, setSelectedService] = useState("");
-  const nurses = [
-    {
-      id: "grace-johnson",
-      name: "Grace Johnson",
-      location: "Lagos",
-      role: "Registered Nurse",
-      service: "Home Nursing Care",
-      experience: "5+ Years Experience",
-      description: "Specializes in home nursing, elderly care, and patient support.",
-    },
-    {
-      id: "sarah-williams",
-      name: "Sarah Williams",
-      location: "Abuja",
-      role: "Licensed Practical Nurse",
-      service: "Post-Surgery Care",
-      experience: "4+ Years Experience",
-      description: "Provides post-surgery care and general caregiving support.",
-    },
-    {
-      id: "david-brown",
-      name: "David Brown",
-      location: "Port Harcourt",
-      role: "Registered Nurse",
-      service: "Elderly Care",
-      experience: "7+ Years Experience",
-      description: "Experienced in chronic care support and home nursing services.",
-    },
-  ];
-  const [filteredNurses, setFilteredNurses] = useState(nurses);
+  const [allNurses, setAllNurses] = useState(getNurses);
+  const [filteredNurses, setFilteredNurses] = useState(getNurses);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const loadedNurses = getNurses();
+    setAllNurses(loadedNurses);
+    setFilteredNurses(loadedNurses);
+
+    return () => {
+      if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    };
+  }, []);
+
+  const services = Array.from(new Set(allNurses.map((nurse) => nurse.service))).sort();
 
   const handleSearch = () => {
-    const normalizedLocation = location.trim().toLowerCase();
+    const normalizedSearchTerm = searchTerm.trim().toLowerCase();
 
-    setFilteredNurses(
-      nurses.filter(
-        (nurse) =>
-          (!normalizedLocation ||
-            nurse.location.toLowerCase().includes(normalizedLocation)) &&
-          (!selectedService || nurse.service === selectedService)
-      )
-    );
+    setIsSearching(true);
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+
+    searchTimerRef.current = setTimeout(() => {
+      setFilteredNurses(
+        allNurses.filter(
+          (nurse) =>
+            (!normalizedSearchTerm ||
+              [nurse.name, nurse.location, nurse.role].some((value) =>
+                value.toLowerCase().includes(normalizedSearchTerm),
+              )) &&
+            (!selectedService || nurse.service === selectedService),
+        ),
+      );
+      setIsSearching(false);
+    }, 300);
+  };
+
+  const handleClearSearch = () => {
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    setSearchTerm("");
+    setSelectedService("");
+    setFilteredNurses(allNurses);
+    setIsSearching(false);
   };
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-gray-50 py-10 px-4 sm:py-16 sm:px-6">
-      <div className="max-w-6xl mx-auto">
-
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-blue-900 mb-4 sm:text-4xl">
-            Find a Nurse
+    <main className="min-h-screen overflow-x-hidden bg-paper px-4 py-10 text-ink sm:px-6 sm:py-16 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+        >
+          <ArrowLeft className="size-4" aria-hidden="true" />
+          Back to Home
+        </Link>
+        <header className="mx-auto max-w-3xl text-center">
+          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
+            Trusted professionals
+          </p>
+          <h1 className="mt-4 font-display text-4xl font-semibold leading-tight text-ink sm:text-5xl">
+            Find the right nurse for your care needs
           </h1>
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
+            Browse qualified professionals by location and specialty, then view their profile to
+            find a confident match for you or your loved one.
+          </p>
+        </header>
 
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Search and connect with qualified nurses based on your
-            caregiving needs.
+        <section
+          className="mt-10 rounded-2xl border border-line bg-surface p-5 shadow-sm sm:mt-12 sm:p-7"
+          aria-labelledby="search-heading"
+        >
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 id="search-heading" className="font-display text-2xl font-semibold text-ink">
+                Search available nurses
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Refine your search to find care in the right place.
+              </p>
+            </div>
+            <span className="hidden items-center gap-2 text-xs font-medium text-success sm:flex">
+              <ShieldCheck className="size-4" aria-hidden="true" />
+              Profiles you can trust
+            </span>
+          </div>
+
+          <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto] lg:items-end">
+            <label className="text-sm font-medium text-ink">
+              Search nurses
+              <span className="relative mt-2 block">
+                <MapPin
+                  className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-primary"
+                  aria-hidden="true"
+                />
+                <input
+                  type="text"
+                  placeholder="Search by name, location, or role"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="h-11 w-full rounded-lg border border-input bg-paper pl-10 pr-4 text-sm text-ink outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
+                />
+              </span>
+            </label>
+
+            <label className="text-sm font-medium text-ink">
+              Service or specialization
+              <select
+                value={selectedService}
+                onChange={(e) => setSelectedService(e.target.value)}
+                className="mt-2 h-11 w-full rounded-lg border border-input bg-paper px-4 text-sm text-ink outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
+              >
+                <option value="">All services</option>
+                {services.map((service) => (
+                  <option key={service} value={service}>
+                    {service}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <Button
+              type="button"
+              onClick={handleSearch}
+              disabled={isSearching}
+              className="h-11 rounded-lg px-6"
+            >
+              {isSearching ? (
+                <LoaderCircle className="animate-spin" aria-hidden="true" />
+              ) : (
+                <Search aria-hidden="true" />
+              )}
+              Search nurses
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClearSearch}
+              disabled={isSearching || (!searchTerm && !selectedService)}
+              className="h-11 rounded-lg border-primary/25 px-5 text-primary shadow-none hover:bg-secondary hover:text-primary"
+            >
+              <X aria-hidden="true" />
+              Clear Search
+            </Button>
+          </div>
+        </section>
+
+        <div className="mt-12 flex flex-col gap-2 border-b border-line pb-5 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
+              Your options
+            </p>
+            <h2 className="mt-2 font-display text-3xl font-semibold text-ink">Available Nurses</h2>
+          </div>
+          <p className="text-sm text-muted-foreground" aria-live="polite">
+            {filteredNurses.length} {filteredNurses.length === 1 ? "nurse" : "nurses"} found
           </p>
         </div>
 
-        <div className="bg-white p-4 rounded-xl shadow-md mb-10 sm:p-6">
-          <h2 className="text-xl font-semibold mb-4">
-            Search for a Nurse
-          </h2>
-
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-
-            <input
-              type="text"
-              placeholder="Search by location"
-               value={location}
-               onChange={(e) => setLocation(e.target.value)}
-              className="border rounded-lg px-4 py-3"
-            />
-
-            <select
-              value={selectedService}
-              onChange={(e) => setSelectedService(e.target.value)}
-              className="border rounded-lg px-4 py-3"
-            >
-              <option value="">Choose a service</option>
-              <option>Home Nursing Care</option>
-              <option>Elderly Care</option>
-              <option>Post-Surgery Care</option>
-              <option>General Caregiving</option>
-            </select>
-
-            <button
-              onClick={handleSearch}
-              className="w-full bg-blue-900 text-white rounded-lg px-6 py-3 hover:bg-blue-800 lg:w-auto"
-            >
-              Search
-            </button>
-
-          </div>
-        </div>
-
-        <h2 className="text-2xl font-bold text-blue-900 mb-6 sm:text-3xl">
-          Available Nurses
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredNurses.length > 0 ? (
-            filteredNurses.map((nurse) => (
-              <div key={nurse.name} className="min-w-0 bg-white rounded-xl shadow-md p-5 sm:p-6">
-                <h3 className="text-xl font-bold text-blue-900">
-                  {nurse.name}
-                </h3>
-
-                <p className="text-gray-600 mt-1">{nurse.role}</p>
-
-                <p className="text-gray-500 mt-3">
-                  📍 {nurse.location}, Nigeria
-                </p>
-
-                <Link
-                  to="/nurse-profile/$nurseId"
-                  params={{ nurseId: nurse.id }}
-                  className="mt-5 inline-block w-full bg-blue-900 text-center text-white px-5 py-2 rounded-lg hover:bg-blue-800 sm:w-auto"
+        <div
+          className="mt-7 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
+          aria-busy={isSearching}
+        >
+          {isSearching ? (
+            <div className="col-span-full grid gap-5 md:grid-cols-2 xl:grid-cols-3" aria-live="polite">
+              <span className="sr-only">Searching nurse profiles...</span>
+              {Array.from({ length: 3 }, (_, index) => (
+                <div
+                  key={index}
+                  className="h-64 animate-pulse rounded-2xl border border-line bg-surface p-6 shadow-sm"
                 >
-                  View Profile
-                </Link>
-              </div>
+                  <div className="h-6 w-2/3 rounded bg-secondary" />
+                  <div className="mt-3 h-4 w-1/2 rounded bg-secondary" />
+                  <div className="mt-8 h-px w-full bg-line" />
+                  <div className="mt-5 h-4 w-4/5 rounded bg-secondary" />
+                  <div className="mt-3 h-4 w-3/5 rounded bg-secondary" />
+                  <div className="mt-8 h-10 w-full rounded-lg bg-secondary" />
+                </div>
+              ))}
+            </div>
+          ) : filteredNurses.length > 0 ? (
+            filteredNurses.map((nurse) => (
+              <article
+                key={nurse.id}
+                className="group flex min-w-0 flex-col rounded-2xl border border-line bg-surface p-5 shadow-sm transition duration-300 motion-safe:hover:-translate-y-1 hover:border-primary/25 hover:shadow-xl hover:shadow-primary/5 sm:p-6"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <h3 className="font-display text-2xl font-semibold leading-tight text-ink">
+                      {nurse.name}
+                    </h3>
+                    <p className="mt-2 text-sm font-medium text-primary">{nurse.role}</p>
+                  </div>
+                  <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary text-primary">
+                    <BadgeCheck className="size-5" aria-hidden="true" />
+                  </span>
+                </div>
+
+                <div className="mt-6 flex flex-col gap-3 border-y border-line py-5 text-sm text-muted-foreground">
+                  <span className="flex items-start gap-2">
+                    <MapPin className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+                    <span>{nurse.location}</span>
+                  </span>
+                  <span className="flex items-start gap-2">
+                    <BriefcaseMedical
+                      className="mt-0.5 size-4 shrink-0 text-primary"
+                      aria-hidden="true"
+                    />
+                    <span>{nurse.service}</span>
+                  </span>
+                </div>
+
+                <div className="mt-5 flex flex-1 flex-col">
+                  {nurse.description && (
+                    <p className="text-sm leading-6 text-muted-foreground">{nurse.description}</p>
+                  )}
+                  <p
+                    className={`mt-4 text-xs font-semibold ${
+                      nurse.availability === "Available" ? "text-success" : "text-muted-foreground"
+                    }`}
+                  >
+                    {nurse.availability ?? "Availability confirmed on request"}
+                  </p>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="mt-6 h-11 w-full rounded-lg border-primary/25 text-primary shadow-none hover:bg-primary hover:text-primary-foreground"
+                  >
+                    <Link to="/nurse-profile/$nurseId" params={{ nurseId: nurse.id }}>
+                      View Profile
+                    </Link>
+                  </Button>
+                </div>
+              </article>
             ))
           ) : (
-            <p className="text-gray-600">No nurses found in this location.</p>
+            <div className="col-span-full rounded-2xl border border-dashed border-line bg-surface px-6 py-12 text-center">
+              <Search className="mx-auto size-8 text-primary" aria-hidden="true" />
+              <h3 className="mt-4 font-display text-2xl font-semibold text-ink">No nurses found</h3>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+                Try a different location or service to broaden your search.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleClearSearch}
+                className="mt-6 h-10 rounded-lg border-primary/25 text-primary shadow-none hover:bg-secondary hover:text-primary"
+              >
+                <X aria-hidden="true" />
+                Clear Search
+              </Button>
+            </div>
           )}
-
-</div>
-
+        </div>
       </div>
     </main>
   );

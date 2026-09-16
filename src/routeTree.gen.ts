@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as FindNurseRouteImport } from './routes/find-nurse'
 import { Route as JoinAsNurseRouteImport } from './routes/join-as-nurse'
 import { Route as NurseProfileNurseIdRouteImport } from './routes/nurse-profile.$nurseId'
@@ -18,6 +19,11 @@ import { Route as RequestCareNurseIdRouteImport } from './routes/request-care.$n
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FindNurseRoute = FindNurseRouteImport.update({
@@ -43,6 +49,7 @@ const RequestCareNurseIdRoute = RequestCareNurseIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
   '/find-nurse': typeof FindNurseRoute
   '/join-as-nurse': typeof JoinAsNurseRoute
   '/nurse-profile/$nurseId': typeof NurseProfileNurseIdRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
   '/find-nurse': typeof FindNurseRoute
   '/join-as-nurse': typeof JoinAsNurseRoute
   '/nurse-profile/$nurseId': typeof NurseProfileNurseIdRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
   '/find-nurse': typeof FindNurseRoute
   '/join-as-nurse': typeof JoinAsNurseRoute
   '/nurse-profile/$nurseId': typeof NurseProfileNurseIdRoute
@@ -67,6 +76,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/dashboard'
     | '/find-nurse'
     | '/join-as-nurse'
     | '/nurse-profile/$nurseId'
@@ -74,6 +84,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/dashboard'
     | '/find-nurse'
     | '/join-as-nurse'
     | '/nurse-profile/$nurseId'
@@ -81,6 +92,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/dashboard'
     | '/find-nurse'
     | '/join-as-nurse'
     | '/nurse-profile/$nurseId'
@@ -89,6 +101,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRoute: typeof DashboardRoute
   FindNurseRoute: typeof FindNurseRoute
   JoinAsNurseRoute: typeof JoinAsNurseRoute
   NurseProfileNurseIdRoute: typeof NurseProfileNurseIdRoute
@@ -102,6 +115,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/find-nurse': {
@@ -137,6 +157,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRoute,
   FindNurseRoute: FindNurseRoute,
   JoinAsNurseRoute: JoinAsNurseRoute,
   NurseProfileNurseIdRoute: NurseProfileNurseIdRoute,

@@ -4,10 +4,10 @@ import { routeTree } from "./routeTree.gen";
 
 export const getRouter = () => {
   const queryClient = new QueryClient();
-  const basepath =
-    import.meta.env.BASE_URL === "/"
-      ? "/"
-      : import.meta.env.BASE_URL.replace(/\/$/, "");
+  const basepath = (import.meta.env["TSS_ROUTER_BASEPATH"] ?? "/nurselink-connect").replace(
+    /\/$/,
+    "",
+  );
 
   const router = createRouter({
     routeTree,

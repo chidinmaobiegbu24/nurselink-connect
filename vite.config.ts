@@ -7,28 +7,26 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
-    nitro: {
-      preset: "static",
-      output: {
-        dir: "dist",
-        publicDir: "dist",
-      },
+  nitro: {
+    output: {
+      dir: ".output-preview",
     },
+  },
   vite: {
     server: {
   port: 8082,
 },
-    base: process.env["VITE_BASE_PATH"] ?? "/nurselink-connect/",
+    base: "/",
     build: {
       outDir: "dist",
     },
   },
   tanstackStart: {
+    router: {
+      basepath: "/nurselink-connect",
+    },
       prerender: {
         routes: ["/", "/find-nurse", "/join-as-nurse"],
       },
-    // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-    // nitro/vite builds from this
-    server: { entry: "server" },
   },
 });
