@@ -1,10 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, CalendarDays, ClipboardList, ShieldCheck, UserRound } from "lucide-react";
-import { useState, type ChangeEvent, type FormEvent } from "react";
-import { useEffect } from "react";
-
+import {
+  ArrowLeft,
+  CalendarDays,
+  ClipboardList,
+  ShieldCheck,
+  UserRound,
+} from "lucide-react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
-import { getNurses, saveCareRequest } from "@/lib/mock-data";
 
 const initialForm = {
   fullName: "",
@@ -18,6 +21,18 @@ const initialForm = {
 
 type FormField = keyof typeof initialForm;
 type FormErrors = Partial<Record<FormField, string>>;
+
+type Nurse = {
+  _id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  location: string;
+  professionalRole: string;
+  service: string;
+  yearsOfExperience: number;
+  availability: "Available" | "Currently Unavailable";
+};
 
 const inputClassName = (hasError: boolean) =>
   `mt-2 h-11 w-full rounded-lg border bg-paper px-4 text-sm font-normal text-ink outline-none transition placeholder:text-muted-foreground/70 focus:ring-2 focus:ring-primary/15 ${
@@ -42,55 +57,129 @@ export const Route = createFileRoute("/request-care/$nurseId")({
 
 function RequestCare() {
   const { nurseId } = Route.useParams();
-  const [nurses, setNurses] = useState(getNurses);
-  const nurse = nurses.find((profile) => profile.id === nurseId);
+
+  const [nurse, setNurse] = useState<Nurse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   useEffect(() => {
-    setNurses(getNurses());
-  }, []);
+    const loadNurse = async () => {
+      try {
+        setLoading(true);
+        setLoadError("");
+
+        const response = await fetch(
+          "http://localhost:5000/api/nurses",
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch nurses");
+        }
+
+        const data: Nurse[] = await response.json();
+
+        const selectedNurse = data.find(
+          (profile) => profile._id === nurseId,
+        );
+
+        if (!selectedNurse) {
+          setLoadError("Nurse profile not found.");
+          setNurse(null);
+          return;
+        }
+
+        setNurse(selectedNurse);
+      } catch (error) {
+        console.error("Failed to load nurse:", error);
+
+        setLoadError(
+          "Unable to load this nurse profile. Please make sure the backend server is running.",
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadNurse();
+  }, [nurseId]);
 
   const handleChange = (
-    event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+    event: ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) => {
     const { name, value } = event.target;
-    setForm((currentForm) => ({ ...currentForm, [name]: value }));
+
+    setForm((currentForm) => ({
+      ...currentForm,
+      [name]: value,
+    }));
+
     setErrors((currentErrors) => {
-      if (!currentErrors[name as FormField]) return currentErrors;
+      if (!currentErrors[name as FormField]) {
+        return currentErrors;
+      }
 
       const nextErrors = { ...currentErrors };
       delete nextErrors[name as FormField];
+
       return nextErrors;
     });
+
     setSubmitted(false);
+    setSubmitError("");
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const nextErrors: FormErrors = {};
+
     const trimmedFullName = form.fullName.trim();
     const trimmedEmail = form.email.trim();
     const trimmedPhone = form.phone.trim();
     const trimmedLocation = form.location.trim();
+
     const phoneDigits = trimmedPhone.replace(/\D/g, "");
 
-    if (!trimmedFullName) nextErrors.fullName = "Please enter your full name.";
+    if (!trimmedFullName) {
+      nextErrors.fullName = "Please enter your full name.";
+    }
+
     if (!trimmedEmail) {
       nextErrors.email = "Please enter your email address.";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
-      nextErrors.email = "Please enter a valid email address, such as you@example.com.";
+      nextErrors.email =
+        "Please enter a valid email address, such as you@example.com.";
     }
+
     if (!trimmedPhone) {
       nextErrors.phone = "Please enter your phone number.";
-    } else if (!/^\+?[0-9\s().-]+$/.test(trimmedPhone) || phoneDigits.length < 7) {
-      nextErrors.phone = "Please enter a valid phone number with at least 7 digits.";
+    } else if (
+      !/^\+?[0-9\s().-]+$/.test(trimmedPhone) ||
+      phoneDigits.length < 7
+    ) {
+      nextErrors.phone =
+        "Please enter a valid phone number with at least 7 digits.";
     }
-    if (!trimmedLocation) nextErrors.location = "Please enter where care is needed.";
-    if (!form.careType) nextErrors.careType = "Please select the type of care needed.";
-    if (!form.startDate) nextErrors.startDate = "Please choose a preferred start date.";
+
+    if (!trimmedLocation) {
+      nextErrors.location = "Please enter where care is needed.";
+    }
+
+    if (!form.careType) {
+      nextErrors.careType = "Please select the type of care needed.";
+    }
+
+    if (!form.startDate) {
+      nextErrors.startDate = "Please choose a preferred start date.";
+    }
 
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
@@ -98,41 +187,105 @@ function RequestCare() {
       return;
     }
 
+    if (!nurse) {
+      setSubmitError("Nurse information is unavailable.");
+      return;
+    }
+
     setErrors({});
-    saveCareRequest({
-      id: `request-${Date.now()}`,
-      patient: form.fullName,
-      service: form.careType,
-      nurse: nurse?.name ?? "Unassigned",
-      status: "Pending",
-      date: new Date().toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }),
-      email: form.email,
-      phone: form.phone,
-      location: form.location,
-      startDate: form.startDate,
-      notes: form.notes,
-    });
-    setForm(initialForm);
-    setSubmitted(true);
+    setSubmitted(false);
+    setSubmitError("");
+    setSubmitting(true);
+
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/care-requests",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            patient: form.fullName.trim(),
+            service: form.careType,
+            nurse: nurse.fullName,
+            status: "Pending",
+            date: new Date().toLocaleDateString("en-GB", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            }),
+            email: form.email.trim(),
+            phone: form.phone.trim(),
+            location: form.location.trim(),
+            startDate: form.startDate,
+            notes: form.notes.trim(),
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+
+        throw new Error(
+          errorData?.message || "Failed to submit care request.",
+        );
+      }
+
+      await response.json();
+
+      setForm(initialForm);
+      setSubmitted(true);
+    } catch (error) {
+      console.error("Failed to submit care request:", error);
+
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Unable to submit your care request. Please try again.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  if (!nurse) {
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-paper px-4 py-10 text-ink sm:px-6 sm:py-16 lg:px-8">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
+            Loading profile
+          </p>
+
+          <h1 className="mt-4 font-display text-4xl font-semibold text-ink sm:text-5xl">
+            Loading nurse information...
+          </h1>
+
+          <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-muted-foreground">
+            Please wait while we load the selected nurse profile.
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  if (!nurse || loadError) {
     return (
       <main className="min-h-screen bg-paper px-4 py-10 text-ink sm:px-6 sm:py-16 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
             Request unavailable
           </p>
+
           <h1 className="mt-4 font-display text-4xl font-semibold text-ink sm:text-5xl">
             Nurse profile not found
           </h1>
+
           <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-muted-foreground">
-            This profile may have been removed or the link may be out of date.
+            {loadError ||
+              "This profile may have been removed or the link may be out of date."}
           </p>
+
           <Button asChild className="mt-8 h-11 rounded-lg">
             <Link to="/find-nurse">Back to Find a Nurse</Link>
           </Button>
@@ -146,22 +299,28 @@ function RequestCare() {
       <div className="mx-auto max-w-5xl">
         <Link
           to="/nurse-profile/$nurseId"
-          params={{ nurseId: nurse.id }}
+          params={{ nurseId: nurse._id }}
           className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
           Back to Nurse Profile
         </Link>
+
         <header className="mx-auto max-w-3xl text-center">
           <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
             Personalised care
           </p>
+
           <h1 className="mt-4 font-display text-4xl font-semibold leading-tight text-ink sm:text-5xl">
             Request care with confidence
           </h1>
+
           <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
-            Tell us a little about your needs and {nurse.name} will have the right context to
-            respond to your request.
+            Tell us a little about your needs{" "}
+            <span className="font-semibold text-ink">
+              {nurse.fullName}
+            </span>{" "}
+            will have the right context to respond to your request.
           </p>
         </header>
 
@@ -174,8 +333,12 @@ function RequestCare() {
             <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-secondary text-primary">
               <UserRound className="size-5" aria-hidden="true" />
             </span>
+
             <div>
-              <h2 className="font-display text-2xl font-semibold text-ink">Your details</h2>
+              <h2 className="font-display text-2xl font-semibold text-ink">
+                Your details
+              </h2>
+
               <p className="mt-1 text-sm leading-6 text-muted-foreground">
                 So the nurse can contact you about your request.
               </p>
@@ -185,6 +348,7 @@ function RequestCare() {
           <div className="grid grid-cols-1 gap-5 pt-6 md:grid-cols-2">
             <label className="text-sm font-semibold text-ink">
               Full name
+
               <input
                 name="fullName"
                 type="text"
@@ -194,11 +358,17 @@ function RequestCare() {
                 onChange={handleChange}
                 required
                 aria-invalid={Boolean(errors.fullName)}
-                aria-describedby={errors.fullName ? "fullName-error" : undefined}
+                aria-describedby={
+                  errors.fullName ? "fullName-error" : undefined
+                }
                 className={inputClassName(Boolean(errors.fullName))}
               />
+
               {errors.fullName && (
-                <p id="fullName-error" className="mt-1.5 text-xs font-medium text-destructive">
+                <p
+                  id="fullName-error"
+                  className="mt-1.5 text-xs font-medium text-destructive"
+                >
                   {errors.fullName}
                 </p>
               )}
@@ -206,6 +376,7 @@ function RequestCare() {
 
             <label className="text-sm font-semibold text-ink">
               Email address
+
               <input
                 name="email"
                 type="email"
@@ -215,11 +386,17 @@ function RequestCare() {
                 onChange={handleChange}
                 required
                 aria-invalid={Boolean(errors.email)}
-                aria-describedby={errors.email ? "email-error" : undefined}
+                aria-describedby={
+                  errors.email ? "email-error" : undefined
+                }
                 className={inputClassName(Boolean(errors.email))}
               />
+
               {errors.email && (
-                <p id="email-error" className="mt-1.5 text-xs font-medium text-destructive">
+                <p
+                  id="email-error"
+                  className="mt-1.5 text-xs font-medium text-destructive"
+                >
                   {errors.email}
                 </p>
               )}
@@ -227,6 +404,7 @@ function RequestCare() {
 
             <label className="text-sm font-semibold text-ink">
               Phone number
+
               <input
                 name="phone"
                 type="tel"
@@ -236,11 +414,17 @@ function RequestCare() {
                 onChange={handleChange}
                 required
                 aria-invalid={Boolean(errors.phone)}
-                aria-describedby={errors.phone ? "phone-error" : undefined}
+                aria-describedby={
+                  errors.phone ? "phone-error" : undefined
+                }
                 className={inputClassName(Boolean(errors.phone))}
               />
+
               {errors.phone && (
-                <p id="phone-error" className="mt-1.5 text-xs font-medium text-destructive">
+                <p
+                  id="phone-error"
+                  className="mt-1.5 text-xs font-medium text-destructive"
+                >
                   {errors.phone}
                 </p>
               )}
@@ -248,6 +432,7 @@ function RequestCare() {
 
             <label className="text-sm font-semibold text-ink">
               Care location
+
               <input
                 name="location"
                 type="text"
@@ -257,11 +442,17 @@ function RequestCare() {
                 onChange={handleChange}
                 required
                 aria-invalid={Boolean(errors.location)}
-                aria-describedby={errors.location ? "location-error" : undefined}
+                aria-describedby={
+                  errors.location ? "location-error" : undefined
+                }
                 className={inputClassName(Boolean(errors.location))}
               />
+
               {errors.location && (
-                <p id="location-error" className="mt-1.5 text-xs font-medium text-destructive">
+                <p
+                  id="location-error"
+                  className="mt-1.5 text-xs font-medium text-destructive"
+                >
                   {errors.location}
                 </p>
               )}
@@ -272,8 +463,12 @@ function RequestCare() {
             <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-success-soft text-success">
               <ClipboardList className="size-5" aria-hidden="true" />
             </span>
+
             <div>
-              <h2 className="font-display text-2xl font-semibold text-ink">Care preferences</h2>
+              <h2 className="font-display text-2xl font-semibold text-ink">
+                Care preferences
+              </h2>
+
               <p className="mt-1 text-sm leading-6 text-muted-foreground">
                 Help us understand the support you are looking for.
               </p>
@@ -283,23 +478,36 @@ function RequestCare() {
           <div className="grid grid-cols-1 gap-5 pt-6 md:grid-cols-2">
             <label className="text-sm font-semibold text-ink">
               Type of care needed
+
               <select
                 name="careType"
                 value={form.careType}
                 onChange={handleChange}
                 required
                 aria-invalid={Boolean(errors.careType)}
-                aria-describedby={errors.careType ? "careType-error" : undefined}
+                aria-describedby={
+                  errors.careType ? "careType-error" : undefined
+                }
                 className={inputClassName(Boolean(errors.careType))}
               >
                 <option value="">Select a care service</option>
-                <option>Home Nursing Care</option>
-                <option>Elderly Care</option>
-                <option>Post-Surgery Care</option>
-                <option>General Caregiving</option>
+                <option value="Home Nursing Care">
+                  Home Nursing Care
+                </option>
+                <option value="Elderly Care">Elderly Care</option>
+                <option value="Post-Surgery Care">
+                  Post-Surgery Care
+                </option>
+                <option value="General Caregiving">
+                  General Caregiving
+                </option>
               </select>
+
               {errors.careType && (
-                <p id="careType-error" className="mt-1.5 text-xs font-medium text-destructive">
+                <p
+                  id="careType-error"
+                  className="mt-1.5 text-xs font-medium text-destructive"
+                >
                   {errors.careType}
                 </p>
               )}
@@ -307,6 +515,7 @@ function RequestCare() {
 
             <label className="text-sm font-semibold text-ink">
               Preferred start date
+
               <input
                 name="startDate"
                 type="date"
@@ -315,11 +524,17 @@ function RequestCare() {
                 onChange={handleChange}
                 required
                 aria-invalid={Boolean(errors.startDate)}
-                aria-describedby={errors.startDate ? "startDate-error" : undefined}
+                aria-describedby={
+                  errors.startDate ? "startDate-error" : undefined
+                }
                 className={inputClassName(Boolean(errors.startDate))}
               />
+
               {errors.startDate && (
-                <p id="startDate-error" className="mt-1.5 text-xs font-medium text-destructive">
+                <p
+                  id="startDate-error"
+                  className="mt-1.5 text-xs font-medium text-destructive"
+                >
                   {errors.startDate}
                 </p>
               )}
@@ -330,10 +545,12 @@ function RequestCare() {
             <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-clay-soft text-accent">
               <CalendarDays className="size-5" aria-hidden="true" />
             </span>
+
             <div>
               <h2 className="font-display text-2xl font-semibold text-ink">
                 Anything else to share?
               </h2>
+
               <p className="mt-1 text-sm leading-6 text-muted-foreground">
                 Optional details can help the nurse prepare for your needs.
               </p>
@@ -341,7 +558,11 @@ function RequestCare() {
           </div>
 
           <label className="block pt-6 text-sm font-semibold text-ink">
-            Additional notes <span className="font-normal text-muted-foreground">(optional)</span>
+            Additional notes{" "}
+            <span className="font-normal text-muted-foreground">
+              (optional)
+            </span>
+
             <textarea
               name="notes"
               value={form.notes}
@@ -354,13 +575,31 @@ function RequestCare() {
 
           <div className="mt-8 flex flex-col gap-4 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between">
             <p className="flex items-center gap-2 text-xs leading-5 text-muted-foreground">
-              <ShieldCheck className="size-4 shrink-0 text-success" aria-hidden="true" />
+              <ShieldCheck
+                className="size-4 shrink-0 text-success"
+                aria-hidden="true"
+              />
               Your request is shared only to help coordinate your care.
             </p>
-            <Button type="submit" size="lg" className="h-12 rounded-lg px-6 shadow-sm">
-              Submit Care Request
+
+            <Button
+              type="submit"
+              size="lg"
+              disabled={submitting}
+              className="h-12 rounded-lg px-6 shadow-sm"
+            >
+              {submitting ? "Submitting..." : "Submit Care Request"}
             </Button>
           </div>
+
+          {submitError && (
+            <p
+              className="mt-5 rounded-lg border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm font-medium text-destructive"
+              role="alert"
+            >
+              {submitError}
+            </p>
+          )}
 
           {submitted && (
             <p
