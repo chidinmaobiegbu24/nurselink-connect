@@ -36,8 +36,10 @@ jobs:
         env:
           VITE_BASE_PATH: /nurselink-connect/
 
-      - name: Preserve client-side routes
-        run: cp .output-preview/public/index.html .output-preview/public/404.html
+      - name: Check Pages output
+  run: |
+    ls -la .output-preview/public
+    test -f .output-preview/public/index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
