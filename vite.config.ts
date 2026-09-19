@@ -16,7 +16,7 @@ export default defineConfig({
     server: {
   port: 8082,
 },
-    base: "/",
+    base: "/nurselink-connect/",
     build: {
       outDir: "dist",
     },
