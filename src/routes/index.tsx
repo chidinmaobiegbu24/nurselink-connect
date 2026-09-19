@@ -210,9 +210,6 @@ const TESTIMONIALS = [
   },
 ];
 
-function resolveAssetPath(assetPath: string) {
-  return assetPath.replace(/^\/nurselink-connect(?=\/)/, "");
-}
 
 function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -413,7 +410,7 @@ function Home() {
               <div className="rise relative mx-auto max-w-xl overflow-hidden rounded-2xl bg-surface p-2 shadow-2xl shadow-primary/10 ring-1 ring-primary/10">
                 <div className="aspect-[5/4] overflow-hidden rounded-xl sm:aspect-[4/3] lg:aspect-[5/6] xl:aspect-[4/3]">
                   <img
-                    src={resolveAssetPath(heroNurse)}
+                    src={heroNurse}
                     alt="A nurse helping an older woman with home care at her kitchen table"
                     width={1024}
                     height={1280}
@@ -533,7 +530,7 @@ function Home() {
                     <div className="relative overflow-hidden">
                       <div className="aspect-[4/5] w-full overflow-hidden bg-secondary">
                         <img
-                          src={resolveAssetPath(nurse.image)}
+                          src={nurse.image}
                           alt={`Portrait of ${nurse.name}, ${nurse.title}`}
                           width={768}
                           height={960}
