@@ -6,7 +6,9 @@ const basePath = process.env["GITHUB_ACTIONS"]
   : "";
 
 export default defineConfig({
-
+nitro: {
+  preset: "vercel",
+},
   vite: {
     server: {
       port: 8082,
