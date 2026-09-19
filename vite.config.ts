@@ -22,11 +22,13 @@ export default defineConfig({
     },
   },
   tanstackStart: {
-    router: {
-      basepath: "/nurselink-connect",
-    },
-      prerender: {
-        routes: ["/", "/find-nurse", "/join-as-nurse"],
-      },
+  router: {
+    basepath: "/nurselink-connect",
   },
+  prerender: {
+    enabled: true,
+    crawlLinks: true,
+    routes: ["/", "/find-nurse", "/join-as-nurse"],
+  },
+},
 });
