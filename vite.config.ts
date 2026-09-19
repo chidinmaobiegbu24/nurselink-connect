@@ -6,11 +6,6 @@ const basePath = process.env["GITHUB_ACTIONS"]
   : "";
 
 export default defineConfig({
-  nitro: {
-    output: {
-      dir: ".output-preview",
-    },
-  },
 
   vite: {
     server: {
