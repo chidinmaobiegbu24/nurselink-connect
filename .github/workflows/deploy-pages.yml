@@ -2,7 +2,8 @@ name: Deploy Nurses Connect to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -37,9 +38,12 @@ jobs:
           VITE_BASE_PATH: /nurselink-connect/
 
       - name: Check Pages output
-  run: |
-    ls -la .output-preview/public
-    test -f .output-preview/public/index.html
+        run: |
+          ls -la .output-preview/public
+          test -f .output-preview/public/index.html
+
+      - name: Preserve client-side routes
+        run: cp .output-preview/public/index.html .output-preview/public/404.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
