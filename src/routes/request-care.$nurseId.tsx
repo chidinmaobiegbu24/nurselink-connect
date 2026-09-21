@@ -75,7 +75,7 @@ function RequestCare() {
         setLoadError("");
 
         const response = await fetch(
-          "http://localhost:5000/api/nurses",
+          "/api/nurses",
         );
 
         if (!response.ok) {
@@ -199,7 +199,7 @@ function RequestCare() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/care-requests",
+        "/api/care-requests",
         {
           method: "POST",
           headers: {

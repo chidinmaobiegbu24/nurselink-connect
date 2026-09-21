@@ -50,7 +50,7 @@ function NurseProfile() {
         setLoading(true);
         setError("");
 
-        const response = await fetch("http://localhost:5000/api/nurses");
+        const response = await fetch("/api/nurses");
 
         if (!response.ok) {
           throw new Error("Failed to fetch nurses");

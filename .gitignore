@@ -40,3 +40,5 @@ dist/
 # Environment variables and secrets
 .env
 server/.env
+.vercel
+.env*

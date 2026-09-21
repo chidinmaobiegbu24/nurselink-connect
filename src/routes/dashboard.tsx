@@ -102,8 +102,8 @@ function Dashboard() {
         setError("");
 
         const [nursesResponse, requestsResponse] = await Promise.all([
-          fetch("http://localhost:5000/api/nurses"),
-          fetch("http://localhost:5000/api/care-requests"),
+          fetch("/api/nurses"),
+          fetch("/api/care-requests"),
         ]);
 
         if (!nursesResponse.ok) {
