@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Search, MapPin, BriefcaseMedical, Clock, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { getNurses } from "../server/api";
 
 export const Route = createFileRoute("/find-nurse")({
   component: FindNurse,
@@ -31,13 +32,7 @@ function FindNurse() {
         setLoading(true);
         setError("");
 
-        const response = await fetch("/api/nurses");
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch nurses");
-        }
-
-        const data: Nurse[] = await response.json();
+        const data = await getNurses();
 
         setNurses(data);
       } catch (err) {
