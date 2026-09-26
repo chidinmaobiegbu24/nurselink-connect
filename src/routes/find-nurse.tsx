@@ -1,11 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Search, MapPin, BriefcaseMedical, Clock, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { getNurses } from "../server/api";
-
-export const Route = createFileRoute("/find-nurse")({
-  component: FindNurse,
-});
 
 type Nurse = {
   _id: string;
@@ -27,27 +22,29 @@ function FindNurse() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const loadNurses = async () => {
-      try {
-        setLoading(true);
-        setError("");
+  const loadNurses = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-        const data = await getNurses();
+      const response = await fetch("/api/nurses");
 
-        setNurses(data);
-      } catch (err) {
-        console.error("Failed to load nurses:", err);
-
-        setError(
-          "Unable to load nurses. Please make sure the backend server is running.",
-        );
-      } finally {
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error("Failed to fetch nurses");
       }
-    };
 
-    loadNurses();
-  }, []);
+      const data: Nurse[] = await response.json();
+      setNurses(data);
+    } catch (err) {
+      console.error("Failed to load nurses:", err);
+      setError("Unable to load nurses. Please make sure the backend server is running.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  loadNurses();
+}, []);
 
   const filteredNurses = useMemo(() => {
     const searchValue = search.trim().toLowerCase();
@@ -133,7 +130,7 @@ function FindNurse() {
                 <option value="Home Nursing Care">
                   Home Nursing Care
                 </option>
-                <option value="Elderly Care">
+                 <option value="Elderly Care">
                   Elderly Care
                 </option>
                 <option value="Post-Surgery Care">
