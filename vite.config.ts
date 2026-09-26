@@ -26,10 +26,15 @@ nitro: {
       basepath: basePath || "/",
     },
 
+    // TanStack Start 1.168.x prerenders the routes listed in `pages`, plus every
+    // static route it discovers (autoStaticPathsDiscovery) and every <a href> it
+    // finds when crawlLinks is on. The old `prerender.routes` key is not part of
+    // this version's schema and was silently ignored.
+    pages: [{ path: "/" }, { path: "/find-nurse" }, { path: "/join-as-nurse" }],
+
     prerender: {
       enabled: true,
       crawlLinks: true,
-      routes: ["/", "/find-nurse", "/join-as-nurse"],
     },
   },
 });

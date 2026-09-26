@@ -2,6 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Search, MapPin, BriefcaseMedical, Clock, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
+export const Route = createFileRoute("/find-nurse")({
+  component: FindNurse,
+});
+
 type Nurse = {
   _id: string;
   fullName: string;
