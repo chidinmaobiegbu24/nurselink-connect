@@ -24,31 +24,37 @@ function FindNurse() {
   const [service, setService] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [demoNotice, setDemoNotice] = useState<string | null>(null);
 
   useEffect(() => {
-  const loadNurses = async () => {
-    try {
-      setLoading(true);
-      setError("");
+    const loadNurses = async () => {
+      try {
+        setLoading(true);
+        setError("");
 
-      const response = await fetch("/api/nurses");
+        const response = await fetch("/api/nurses");
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch nurses");
+        if (!response.ok) {
+          throw new Error("Failed to fetch nurses");
+        }
+
+        const payload = (await response.json()) as {
+          nurses?: Nurse[];
+          meta?: { source?: "mongodb" | "demo"; notice?: string };
+        };
+
+        setNurses(payload.nurses ?? []);
+        setDemoNotice(payload.meta?.source === "demo" ? (payload.meta.notice ?? null) : null);
+      } catch (err) {
+        console.error("Failed to load nurses:", err);
+        setError("Unable to load nurses right now. Please try again in a moment.");
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const data: Nurse[] = await response.json();
-      setNurses(data);
-    } catch (err) {
-      console.error("Failed to load nurses:", err);
-      setError("Unable to load nurses. Please make sure the backend server is running.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  loadNurses();
-}, []);
+    loadNurses();
+  }, []);
 
   const filteredNurses = useMemo(() => {
     const searchValue = search.trim().toLowerCase();
@@ -60,8 +66,7 @@ function FindNurse() {
         nurse.location.toLowerCase().includes(searchValue) ||
         nurse.professionalRole.toLowerCase().includes(searchValue);
 
-      const matchesService =
-        !service || nurse.service === service;
+      const matchesService = !service || nurse.service === service;
 
       return matchesSearch && matchesService;
     });
@@ -75,29 +80,28 @@ function FindNurse() {
   return (
     <main className="min-h-screen bg-background px-4 py-10 text-foreground sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
-
         {/* Page Heading */}
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Find a Nurse
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Find a Nurse</h1>
 
           <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-            Find professional nurses and caregivers based on your location
-            and care needs.
+            Find professional nurses and caregivers based on your location and care needs.
           </p>
         </div>
+
+        {/* Demo Data Notice: shown when MongoDB is not configured server-side */}
+        {demoNotice && (
+          <p className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            {demoNotice}
+          </p>
+        )}
 
         {/* Search and Filter */}
         <section className="mb-8 rounded-2xl border bg-white p-5 shadow-sm sm:p-6">
           <div className="grid gap-4 md:grid-cols-[1fr_280px_auto]">
-
             {/* Search Input */}
             <div>
-              <label
-                htmlFor="nurse-search"
-                className="mb-2 block text-sm font-medium"
-              >
+              <label htmlFor="nurse-search" className="mb-2 block text-sm font-medium">
                 Search by name, location or role
               </label>
 
@@ -117,10 +121,7 @@ function FindNurse() {
 
             {/* Service Filter */}
             <div>
-              <label
-                htmlFor="service-filter"
-                className="mb-2 block text-sm font-medium"
-              >
+              <label htmlFor="service-filter" className="mb-2 block text-sm font-medium">
                 Service
               </label>
 
@@ -131,18 +132,10 @@ function FindNurse() {
                 className="w-full rounded-lg border bg-background px-4 py-3 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
               >
                 <option value="">All Services</option>
-                <option value="Home Nursing Care">
-                  Home Nursing Care
-                </option>
-                 <option value="Elderly Care">
-                  Elderly Care
-                </option>
-                <option value="Post-Surgery Care">
-                  Post-Surgery Care
-                </option>
-                <option value="General Caregiving">
-                  General Caregiving
-                </option>
+                <option value="Home Nursing Care">Home Nursing Care</option>
+                <option value="Elderly Care">Elderly Care</option>
+                <option value="Post-Surgery Care">Post-Surgery Care</option>
+                <option value="General Caregiving">General Caregiving</option>
               </select>
             </div>
 
@@ -157,7 +150,6 @@ function FindNurse() {
                 Clear
               </button>
             </div>
-
           </div>
         </section>
 
@@ -165,8 +157,7 @@ function FindNurse() {
         {!loading && !error && (
           <div className="mb-5 flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              {filteredNurses.length}{" "}
-              {filteredNurses.length === 1 ? "nurse" : "nurses"} found
+              {filteredNurses.length} {filteredNurses.length === 1 ? "nurse" : "nurses"} found
             </p>
           </div>
         )}
@@ -174,41 +165,31 @@ function FindNurse() {
         {/* Loading State */}
         {loading && (
           <div className="rounded-2xl border bg-white p-10 text-center shadow-sm">
-            <p className="text-muted-foreground">
-              Loading nurses...
-            </p>
+            <p className="text-muted-foreground">Loading nurses...</p>
           </div>
         )}
 
         {/* Error State */}
         {!loading && error && (
           <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
-            <p className="font-medium text-red-700">
-              {error}
-            </p>
+            <p className="font-medium text-red-700">{error}</p>
           </div>
         )}
 
         {/* Nurse Cards */}
         {!loading && !error && filteredNurses.length > 0 && (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-
             {filteredNurses.map((nurse) => (
               <article
                 key={nurse._id}
                 className="rounded-2xl border bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
               >
-
                 {/* Nurse Name and Availability */}
                 <div className="mb-5 flex items-start justify-between gap-3">
                   <div>
-                    <h2 className="text-xl font-semibold">
-                      {nurse.fullName}
-                    </h2>
+                    <h2 className="text-xl font-semibold">{nurse.fullName}</h2>
 
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {nurse.professionalRole}
-                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">{nurse.professionalRole}</p>
                   </div>
 
                   <span
@@ -224,19 +205,14 @@ function FindNurse() {
 
                 {/* Nurse Information */}
                 <div className="space-y-3 text-sm">
-
                   {/* Location */}
                   <div className="flex items-start gap-3">
                     <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
 
                     <div>
-                      <p className="font-medium">
-                        Location
-                      </p>
+                      <p className="font-medium">Location</p>
 
-                      <p className="text-muted-foreground">
-                        {nurse.location}
-                      </p>
+                      <p className="text-muted-foreground">{nurse.location}</p>
                     </div>
                   </div>
 
@@ -245,13 +221,9 @@ function FindNurse() {
                     <BriefcaseMedical className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
 
                     <div>
-                      <p className="font-medium">
-                        Service
-                      </p>
+                      <p className="font-medium">Service</p>
 
-                      <p className="text-muted-foreground">
-                        {nurse.service}
-                      </p>
+                      <p className="text-muted-foreground">{nurse.service}</p>
                     </div>
                   </div>
 
@@ -260,16 +232,11 @@ function FindNurse() {
                     <Clock className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
 
                     <div>
-                      <p className="font-medium">
-                        Experience
-                      </p>
+                      <p className="font-medium">Experience</p>
 
-                      <p className="text-muted-foreground">
-                        {nurse.yearsOfExperience} years
-                      </p>
+                      <p className="text-muted-foreground">{nurse.yearsOfExperience} years</p>
                     </div>
                   </div>
-
                 </div>
 
                 {/* View Profile Button */}
@@ -282,22 +249,17 @@ function FindNurse() {
                     View Profile
                   </Link>
                 </div>
-
               </article>
             ))}
-
           </div>
         )}
 
         {/* No Nurses Found */}
         {!loading && !error && filteredNurses.length === 0 && (
           <div className="rounded-2xl border bg-white p-10 text-center shadow-sm">
-
             <Search className="mx-auto mb-4 h-10 w-10 text-muted-foreground" />
 
-            <h2 className="text-xl font-semibold">
-              No nurses found
-            </h2>
+            <h2 className="text-xl font-semibold">No nurses found</h2>
 
             <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
               Try changing your search or service filter.
@@ -310,10 +272,8 @@ function FindNurse() {
             >
               Clear Filters
             </button>
-
           </div>
         )}
-
       </div>
     </main>
   );

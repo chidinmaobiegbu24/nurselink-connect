@@ -13,6 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as FindNurseRouteImport } from './routes/find-nurse'
 import { Route as JoinAsNurseRouteImport } from './routes/join-as-nurse'
+import { Route as ApiCareRequestsRouteImport } from './routes/api/care-requests'
+import { Route as ApiNursesRouteImport } from './routes/api/nurses'
 import { Route as NurseProfileNurseIdRouteImport } from './routes/nurse-profile.$nurseId'
 import { Route as RequestCareNurseIdRouteImport } from './routes/request-care.$nurseId'
 
@@ -36,6 +38,16 @@ const JoinAsNurseRoute = JoinAsNurseRouteImport.update({
   path: '/join-as-nurse',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCareRequestsRoute = ApiCareRequestsRouteImport.update({
+  id: '/api/care-requests',
+  path: '/api/care-requests',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiNursesRoute = ApiNursesRouteImport.update({
+  id: '/api/nurses',
+  path: '/api/nurses',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NurseProfileNurseIdRoute = NurseProfileNurseIdRouteImport.update({
   id: '/nurse-profile/$nurseId',
   path: '/nurse-profile/$nurseId',
@@ -52,6 +64,8 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/find-nurse': typeof FindNurseRoute
   '/join-as-nurse': typeof JoinAsNurseRoute
+  '/api/care-requests': typeof ApiCareRequestsRoute
+  '/api/nurses': typeof ApiNursesRoute
   '/nurse-profile/$nurseId': typeof NurseProfileNurseIdRoute
   '/request-care/$nurseId': typeof RequestCareNurseIdRoute
 }
@@ -60,6 +74,8 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/find-nurse': typeof FindNurseRoute
   '/join-as-nurse': typeof JoinAsNurseRoute
+  '/api/care-requests': typeof ApiCareRequestsRoute
+  '/api/nurses': typeof ApiNursesRoute
   '/nurse-profile/$nurseId': typeof NurseProfileNurseIdRoute
   '/request-care/$nurseId': typeof RequestCareNurseIdRoute
 }
@@ -69,6 +85,8 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/find-nurse': typeof FindNurseRoute
   '/join-as-nurse': typeof JoinAsNurseRoute
+  '/api/care-requests': typeof ApiCareRequestsRoute
+  '/api/nurses': typeof ApiNursesRoute
   '/nurse-profile/$nurseId': typeof NurseProfileNurseIdRoute
   '/request-care/$nurseId': typeof RequestCareNurseIdRoute
 }
@@ -79,6 +97,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/find-nurse'
     | '/join-as-nurse'
+    | '/api/care-requests'
+    | '/api/nurses'
     | '/nurse-profile/$nurseId'
     | '/request-care/$nurseId'
   fileRoutesByTo: FileRoutesByTo
@@ -87,6 +107,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/find-nurse'
     | '/join-as-nurse'
+    | '/api/care-requests'
+    | '/api/nurses'
     | '/nurse-profile/$nurseId'
     | '/request-care/$nurseId'
   id:
@@ -95,6 +117,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/find-nurse'
     | '/join-as-nurse'
+    | '/api/care-requests'
+    | '/api/nurses'
     | '/nurse-profile/$nurseId'
     | '/request-care/$nurseId'
   fileRoutesById: FileRoutesById
@@ -104,6 +128,8 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   FindNurseRoute: typeof FindNurseRoute
   JoinAsNurseRoute: typeof JoinAsNurseRoute
+  ApiCareRequestsRoute: typeof ApiCareRequestsRoute
+  ApiNursesRoute: typeof ApiNursesRoute
   NurseProfileNurseIdRoute: typeof NurseProfileNurseIdRoute
   RequestCareNurseIdRoute: typeof RequestCareNurseIdRoute
 }
@@ -138,6 +164,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JoinAsNurseRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/care-requests': {
+      id: '/api/care-requests'
+      path: '/api/care-requests'
+      fullPath: '/api/care-requests'
+      preLoaderRoute: typeof ApiCareRequestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/nurses': {
+      id: '/api/nurses'
+      path: '/api/nurses'
+      fullPath: '/api/nurses'
+      preLoaderRoute: typeof ApiNursesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/nurse-profile/$nurseId': {
       id: '/nurse-profile/$nurseId'
       path: '/nurse-profile/$nurseId'
@@ -160,6 +200,8 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   FindNurseRoute: FindNurseRoute,
   JoinAsNurseRoute: JoinAsNurseRoute,
+  ApiCareRequestsRoute: ApiCareRequestsRoute,
+  ApiNursesRoute: ApiNursesRoute,
   NurseProfileNurseIdRoute: NurseProfileNurseIdRoute,
   RequestCareNurseIdRoute: RequestCareNurseIdRoute,
 }

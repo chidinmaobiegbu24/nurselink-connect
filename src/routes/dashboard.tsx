@@ -114,18 +114,20 @@ function Dashboard() {
           throw new Error("Failed to fetch care requests");
         }
 
-        const nursesData: Nurse[] = await nursesResponse.json();
-        const requestsData: CareRequest[] =
-          await requestsResponse.json();
+        const nursesPayload = (await nursesResponse.json()) as { nurses?: Nurse[] };
+        const requestsPayload = (await requestsResponse.json()) as {
+          careRequests?: CareRequest[];
+        };
+
+        const nursesData = nursesPayload.nurses ?? [];
+        const requestsData = requestsPayload.careRequests ?? [];
 
         setNurses(nursesData);
         setCareRequests(requestsData);
       } catch (error) {
         console.error("Failed to load dashboard:", error);
 
-        setError(
-          "Unable to load dashboard data. Please make sure the backend server is running.",
-        );
+        setError("Unable to load dashboard data right now. Please try again in a moment.");
       } finally {
         setLoading(false);
       }
@@ -134,20 +136,13 @@ function Dashboard() {
     loadDashboardData();
   }, []);
 
-  const availableNurses = nurses.filter(
-    (nurse) => nurse.availability === "Available",
-  );
+  const availableNurses = nurses.filter((nurse) => nurse.availability === "Available");
 
-  const completedRequests = careRequests.filter(
-    (request) => request.status === "Completed",
-  );
+  const completedRequests = careRequests.filter((request) => request.status === "Completed");
 
-  const recentRegisteredNurses = [...nurses]
-    .reverse()
-    .slice(0, 5);
+  const recentRegisteredNurses = [...nurses].reverse().slice(0, 5);
 
-  const recentCareRequests = [...careRequests]
-    .slice(0, 5);
+  const recentCareRequests = [...careRequests].slice(0, 5);
 
   const summaryValues = [
     nurses.length,
@@ -190,9 +185,7 @@ function Dashboard() {
 
         {loading && (
           <div className="mb-8 rounded-2xl border border-line bg-surface p-8 text-center shadow-sm">
-            <p className="text-sm font-medium text-muted-foreground">
-              Loading dashboard data...
-            </p>
+            <p className="text-sm font-medium text-muted-foreground">Loading dashboard data...</p>
           </div>
         )}
 
@@ -202,42 +195,33 @@ function Dashboard() {
           </div>
         )}
 
-        <section
-          aria-label="Summary"
-          className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
-        >
-          {SUMMARY_CARD_DETAILS.map(
-            ({ label, detail, icon: Icon, iconClassName }, index) => (
-              <Card
-                key={label}
-                className="border-line bg-surface shadow-sm transition-shadow hover:shadow-md"
-              >
-                <CardContent className="p-5 sm:p-6">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        {label}
-                      </p>
+        <section aria-label="Summary" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {SUMMARY_CARD_DETAILS.map(({ label, detail, icon: Icon, iconClassName }, index) => (
+            <Card
+              key={label}
+              className="border-line bg-surface shadow-sm transition-shadow hover:shadow-md"
+            >
+              <CardContent className="p-5 sm:p-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">{label}</p>
 
-                      <p className="mt-3 font-display text-4xl font-semibold text-ink">
-                        {summaryValues[index]}
-                      </p>
-                    </div>
-
-                    <span
-                      className={`grid size-11 shrink-0 place-items-center rounded-lg ${iconClassName}`}
-                    >
-                      <Icon className="size-5" aria-hidden="true" />
-                    </span>
+                    <p className="mt-3 font-display text-4xl font-semibold text-ink">
+                      {summaryValues[index]}
+                    </p>
                   </div>
 
-                  <p className="mt-4 text-xs text-muted-foreground">
-                    {detail}
-                  </p>
-                </CardContent>
-              </Card>
-            ),
-          )}
+                  <span
+                    className={`grid size-11 shrink-0 place-items-center rounded-lg ${iconClassName}`}
+                  >
+                    <Icon className="size-5" aria-hidden="true" />
+                  </span>
+                </div>
+
+                <p className="mt-4 text-xs text-muted-foreground">{detail}</p>
+              </CardContent>
+            </Card>
+          ))}
         </section>
 
         <section
@@ -278,10 +262,7 @@ function Dashboard() {
                   >
                     <div className="flex items-start justify-between gap-3">
                       <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-secondary text-primary">
-                        <BadgeCheck
-                          className="size-5"
-                          aria-hidden="true"
-                        />
+                        <BadgeCheck className="size-5" aria-hidden="true" />
                       </span>
 
                       <span
@@ -291,10 +272,7 @@ function Dashboard() {
                             : "bg-secondary text-muted-foreground"
                         }`}
                       >
-                        <ShieldCheck
-                          className="size-3.5"
-                          aria-hidden="true"
-                        />
+                        <ShieldCheck className="size-3.5" aria-hidden="true" />
                         {nurse.availability}
                       </span>
                     </div>
@@ -309,10 +287,7 @@ function Dashboard() {
 
                     <div className="mt-4 flex flex-col gap-2 text-sm text-muted-foreground">
                       <span className="flex items-center gap-2">
-                        <MapPin
-                          className="size-4 shrink-0 text-primary"
-                          aria-hidden="true"
-                        />
+                        <MapPin className="size-4 shrink-0 text-primary" aria-hidden="true" />
                         {nurse.location}
                       </span>
 
@@ -331,18 +306,14 @@ function Dashboard() {
           ) : (
             !loading && (
               <div className="mt-5 rounded-xl border border-dashed border-line bg-paper px-6 py-10 text-center">
-                <Users
-                  className="mx-auto size-8 text-primary"
-                  aria-hidden="true"
-                />
+                <Users className="mx-auto size-8 text-primary" aria-hidden="true" />
 
                 <h3 className="mt-3 font-display text-xl font-semibold text-ink">
                   No nurses registered yet
                 </h3>
 
                 <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-                  New nurse registrations will appear here once they join
-                  Nurses Connect.
+                  New nurse registrations will appear here once they join Nurses Connect.
                 </p>
               </div>
             )
@@ -376,76 +347,53 @@ function Dashboard() {
             <table className="w-full min-w-[720px] border-collapse text-left text-sm">
               <thead className="bg-hero text-xs uppercase tracking-[0.12em] text-muted-foreground">
                 <tr>
-                  <th className="px-5 py-4 font-medium sm:px-6">
-                    Request
-                  </th>
-                  <th className="px-5 py-4 font-medium">
-                    Service
-                  </th>
-                  <th className="px-5 py-4 font-medium">
-                    Nurse
-                  </th>
-                  <th className="px-5 py-4 font-medium">
-                    Status
-                  </th>
-                  <th className="px-5 py-4 font-medium sm:px-6">
-                    Date
-                  </th>
+                  <th className="px-5 py-4 font-medium sm:px-6">Request</th>
+                  <th className="px-5 py-4 font-medium">Service</th>
+                  <th className="px-5 py-4 font-medium">Nurse</th>
+                  <th className="px-5 py-4 font-medium">Status</th>
+                  <th className="px-5 py-4 font-medium sm:px-6">Date</th>
                 </tr>
               </thead>
 
               <tbody className="divide-y divide-line">
-                {recentCareRequests.length > 0 ? (
-                  recentCareRequests.map((request) => (
-                    <tr
-                      key={request._id}
-                      className="transition-colors hover:bg-secondary/40"
-                    >
-                      <td className="px-5 py-4 sm:px-6">
-                        <p className="font-medium text-ink">
-                          {request.patient}
-                        </p>
+                {recentCareRequests.length > 0
+                  ? recentCareRequests.map((request) => (
+                      <tr key={request._id} className="transition-colors hover:bg-secondary/40">
+                        <td className="px-5 py-4 sm:px-6">
+                          <p className="font-medium text-ink">{request.patient}</p>
 
-                        <p className="mt-1 font-mono text-xs text-muted-foreground">
-                          {request._id}
-                        </p>
-                      </td>
+                          <p className="mt-1 font-mono text-xs text-muted-foreground">
+                            {request._id}
+                          </p>
+                        </td>
 
-                      <td className="px-5 py-4 text-muted-foreground">
-                        {request.service}
-                      </td>
+                        <td className="px-5 py-4 text-muted-foreground">{request.service}</td>
 
-                      <td className="px-5 py-4 text-muted-foreground">
-                        {request.nurse}
-                      </td>
+                        <td className="px-5 py-4 text-muted-foreground">{request.nurse}</td>
 
-                      <td className="px-5 py-4">
-                        <span
-                          className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${statusClassName(
-                            request.status,
-                          )}`}
+                        <td className="px-5 py-4">
+                          <span
+                            className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${statusClassName(
+                              request.status,
+                            )}`}
+                          >
+                            {request.status}
+                          </span>
+                        </td>
+
+                        <td className="px-5 py-4 text-muted-foreground sm:px-6">{request.date}</td>
+                      </tr>
+                    ))
+                  : !loading && (
+                      <tr>
+                        <td
+                          colSpan={5}
+                          className="px-5 py-12 text-center text-sm text-muted-foreground sm:px-6"
                         >
-                          {request.status}
-                        </span>
-                      </td>
-
-                      <td className="px-5 py-4 text-muted-foreground sm:px-6">
-                        {request.date}
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  !loading && (
-                    <tr>
-                      <td
-                        colSpan={5}
-                        className="px-5 py-12 text-center text-sm text-muted-foreground sm:px-6"
-                      >
-                        No care requests yet.
-                      </td>
-                    </tr>
-                  )
-                )}
+                          No care requests yet.
+                        </td>
+                      </tr>
+                    )}
               </tbody>
             </table>
           </div>
