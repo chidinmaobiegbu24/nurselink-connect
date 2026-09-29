@@ -110,6 +110,16 @@ deploys it as one Node.js function (which serves `/api/*` and SSR) plus static
 assets. Do **not** set `outputDirectory` (`.vercel/output/static`) — that
 publishes static files only and every `/api/*` request returns 404.
 
+Nitro 3 betas also have an open bug
+([nitrojs/nitro#3211](https://github.com/nitrojs/nitro/issues/3211)): the build
+emits `functions/__server.func/index.mjs` but skips the two metadata files the
+Build Output API requires — `.vercel/output/config.json` (routing) and
+`.vercel/output/functions/__server.func/.vc-config.json` (runtime). Without them
+Vercel again publishes `static/` only. `npm run build` therefore ends with
+`scripts/write-vercel-build-output.mjs`, which writes exactly those files when
+Nitro did not, and no-ops once Nitro emits them itself.
+
+
 1. Import this repository in Vercel; the TanStack Start / Nitro preset is detected automatically.
 2. Add `MONGODB_URI` under Project Settings → Environment Variables for Production, Preview and Development.
 3. MongoDB Atlas allows traffic by IP allow-list, and Vercel's outbound IPs are not fixed — configure the allow-list your deployment needs, otherwise `/api/*` returns `503` with "MongoDB could not be reached".

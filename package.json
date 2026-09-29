@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "vite build && node scripts/write-vercel-build-output.mjs",
     "build:dev": "vite build --mode development",
     "preview": "npx --yes wrangler --cwd .output-preview dev",
     "lint": "eslint .",
